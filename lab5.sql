@@ -56,7 +56,7 @@ FROM departments;*/
 
 SELECT dep.department_id, dep.department_name, count(emp.employee_id) as employees_count
 FROM departments dep
-IINER JOIN employees emp
+INNER JOIN employees emp
 ON (dep.department_id = emp.department_id)
 GROUP BY dep.department_id;
 
