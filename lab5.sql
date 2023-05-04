@@ -48,11 +48,17 @@ FROM employees
 NATURAL JOIN departments
 GROUP BY department_id, department_name;
 
-SELECT department_id, department_name, 
+/*SELECT department_id, department_name, 
 (SELECT count(1) 
  FROM employees 
  WHERE employees.department_id = departments.department_id) AS "count_employees"
-FROM departments;
+FROM departments;*/
+
+SELECT dep.department_id, dep.department_name, count(emp.employee_id) as employees_count
+FROM departments dep
+IINER JOIN employees emp
+ON (dep.department_id = emp.department_id)
+GROUP BY dep.department_id;
 
 SELECT e.employee_id, last_name, count(h.job_id) AS job_count
 FROM employees e
