@@ -4,6 +4,7 @@ CREATE SCHEMA IF NOT EXISTS movie_theather AUTHORIZATION smkhnv;
 
 COMMENT ON SCHEMA movie_theather IS 'Кинотеатр';
 ALTER ROLE smkhnv IN DATABASE smkhnv SET search_path TO movie_theather, public;
+GRANT ALL ON SCHEMA movie_theather TO smkhnv;
 SET search_path TO movie_theather, public;
 
 DROP TABLE IF EXISTS movie CASCADE;
