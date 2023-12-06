@@ -1,10 +1,10 @@
 DROP SCHEMA IF EXISTS movie_theather CASCADE;
 
-CREATE SCHEMA IF NOT EXISTS movie_theather AUTHORIZATION smkhnv;
+CREATE SCHEMA IF NOT EXISTS movie_theather AUTHORIZATION smekhnev_ii;
 
 COMMENT ON SCHEMA movie_theather IS 'Кинотеатр';
-ALTER ROLE smkhnv IN DATABASE smkhnv SET search_path TO movie_theather, public;
-GRANT ALL ON SCHEMA movie_theather TO smkhnv;
+ALTER ROLE smekhnev_ii IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
+GRANT ALL ON SCHEMA movie_theather TO smekhnev_ii;
 SET search_path TO movie_theather, public;
 
 DROP TABLE IF EXISTS movie CASCADE;
@@ -212,10 +212,7 @@ SELECT
     m.movie_year AS movie_year,
     s.session_start_date,
     s.session_end_date,
-    h.hall_id,
-    h.hall_capacity,
-    h.hall_size_screen,
-    h.hall_size_hall
+    h.hall_id
 FROM
     session s
 JOIN
@@ -231,8 +228,6 @@ SELECT
     t.ticket_cost,
     t.ticket_seat_id,
     b.office_id,
-    b.office_start_time,
-    b.office_end_time,
     e.employee_first_name || ' ' || e.employee_last_name AS employee_name
 FROM
     tickets t
