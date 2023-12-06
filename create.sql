@@ -205,4 +205,57 @@ INSERT INTO tickets VALUES (7, 3, 300, 11, 5);
 INSERT INTO tickets VALUES (8, 3, 300, 12, 5);
 INSERT INTO tickets VALUES (9, 4, 320, 55, 4);
 
+CREATE VIEW movie_sessions_view AS
+SELECT
+    s.session_id,
+    m.movie_name_rus AS movie_name,
+    m.movie_year AS movie_year,
+    s.session_start_date,
+    s.session_end_date,
+    h.hall_id,
+    h.hall_capacity,
+    h.hall_size_screen,
+    h.hall_size_hall
+FROM
+    session s
+JOIN
+    movie m ON s.session_movie_id = m.movie_id
+JOIN
+    cinema_hall h ON s.session_hall_id = h.hall_id;
 
+CREATE VIEW ticket_sales_view AS
+SELECT
+    t.ticket_id,
+    m.movie_name_rus AS movie_name,
+    s.session_start_date,
+    t.ticket_cost,
+    t.ticket_seat_id,
+    b.office_id,
+    b.office_start_time,
+    b.office_end_time,
+    e.employee_first_name || ' ' || e.employee_last_name AS employee_name
+FROM
+    tickets t
+JOIN
+    session s ON t.ticket_session_id = s.session_id
+JOIN
+    movie m ON s.session_movie_id = m.movie_id
+LEFT JOIN
+    box_office b ON t.ticket_office_id = b.office_id
+LEFT JOIN
+    employees e ON b.office_employee_id = e.employee_id;
+
+CREATE VIEW employee_schedule_view AS
+SELECT
+    e.employee_id,
+    e.employee_first_name,
+    e.employee_last_name,
+    e.employee_birthday,
+    e.employee_email,
+    b.office_id,
+    b.office_start_time,
+    b.office_end_time
+FROM
+    employees e
+JOIN
+    box_office b ON e.employee_id = b.office_employee_id;
