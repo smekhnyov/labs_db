@@ -315,3 +315,36 @@ BEGIN
 	END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TABLE IF NOT EXISTS Ticket_Audit (
+    audit_id SERIAL PRIMARY KEY,
+    ticket_id INTEGER,
+    action VARCHAR(10) NOT NULL,
+    audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    old_data JSONB,
+    new_data JSONB
+);
+
+CREATE OR REPLACE FUNCTION ticket_audit()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO Ticket_Audit (ticket_id, action, new_data)
+        VALUES (NEW.ticket_id, 'INSERT', ROW_TO_JSON(NEW)::JSONB);
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO Ticket_Audit (ticket_id, action, old_data, new_data)
+        VALUES (NEW.ticket_id, 'UPDATE', ROW_TO_JSON(OLD)::JSONB, ROW_TO_JSON(NEW)::JSONB);
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO Ticket_Audit (ticket_id, action, old_data)
+        VALUES (OLD.ticket_id, 'DELETE', ROW_TO_JSON(OLD)::JSONB);
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER Ticket_audit_trigger
+AFTER INSERT OR UPDATE OR DELETE
+ON tickets
+FOR EACH ROW
+EXECUTE FUNCTION ticket_audit();
+
