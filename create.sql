@@ -5,7 +5,6 @@ CREATE SCHEMA IF NOT EXISTS movie_theather AUTHORIZATION smekhnev_ii;
 COMMENT ON SCHEMA movie_theather IS 'Кинотеатр';
 ALTER ROLE smekhnev_ii IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
 GRANT ALL ON SCHEMA movie_theather TO smekhnev_ii;
-SET search_path TO movie_theather, public;
 
 DROP TABLE IF EXISTS movie CASCADE;
 DROP TABLE IF EXISTS box_office CASCADE;
@@ -82,6 +81,8 @@ COMMENT ON COLUMN session.session_start_date IS 'Время начала сеа�
 COMMENT ON COLUMN session.session_end_date IS 'Время окончания сеанса';
 COMMENT ON COLUMN session.session_movie_id IS 'Название фильма сеанса';
 COMMENT ON COLUMN session.session_hall_id IS 'Номер кинозала сеанса';
+
+
 
 CREATE TABLE IF NOT EXISTS tickets (
 	ticket_id serial NOT NULL,
@@ -254,3 +255,63 @@ FROM
     employees e
 JOIN
     box_office b ON e.employee_id = b.office_employee_id;
+
+CREATE SEQUENCE ticket_id_sequence
+    START WITH 10
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE OR REPLACE FUNCTION getRandomSession() RETURNS TABLE (
+    sessions_id integer,
+    halls_capacity integer
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        s.session_id AS sessions_id,
+        h.hall_capacity AS halls_capacity
+    FROM 
+        session s
+    JOIN 
+        cinema_hall h ON s.session_hall_id = h.hall_id
+    ORDER BY 
+        RANDOM()
+    LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION getRandomOffice() RETURNS TABLE (
+	box_office_id integer
+) AS $$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		office_id as box_office_id
+	FROM box_office
+	ORDER BY RANDOM()
+	LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE generateTicket(num_ticket INTEGER) AS $$
+DECLARE
+	t_ticket_id integer;
+	t_session_id integer;
+	t_ticket_cost integer;
+	t_seat_id integer;
+	t_box_office_id integer;
+	t_hall_capacity integer;
+BEGIN
+	FOR t_ticket_id IN 1..num_ticket LOOP
+		SELECT sessions_id, halls_capacity INTO t_session_id, t_hall_capacity FROM getRandomSession();
+		SELECT box_office_id INTO t_box_office_id FROM getRandomOffice();
+
+		t_ticket_cost := floor(random() * 1000) + 100;
+		t_seat_id := floor(random() * t_hall_capacity) + 1;
+
+		INSERT INTO tickets VALUES (nextval('ticket_id_sequence'), t_session_id, t_ticket_cost, t_seat_id, t_box_office_id);
+	END LOOP;
+END;
+$$ LANGUAGE plpgsql;
