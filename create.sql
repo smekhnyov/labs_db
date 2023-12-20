@@ -348,3 +348,27 @@ ON tickets
 FOR EACH ROW
 EXECUTE FUNCTION ticket_audit();
 
+CREATE ROLE hr_movie_theather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO hr_movie_theather;
+GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE box_office TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE employees TO hr_movie_theather;
+
+CREATE ROLE admin_movie_theather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO hr_movie_theather;
+GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE movie TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE cinema_hall TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE session TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE directors TO hr_movie_theather;
+
+CREATE USER cashir_movie_thather WITH PASSWORD 'cashier';
+GRANT hr_movie_theather TO cashir_movie_thather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO cashir_movie_thather;
+ALTER ROLE hr_uscashir_movie_thatherer IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
+
+CREATE USER admin1_movie_theather WITH PASSWORD 'admin1';
+GRANT admin_movie_theather TO admin1_movie_theather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO admin1_movie_theather;
+ALTER ROLE admin1_movie_theather IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
