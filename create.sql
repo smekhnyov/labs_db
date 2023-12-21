@@ -348,6 +348,24 @@ ON tickets
 FOR EACH ROW
 EXECUTE FUNCTION ticket_audit();
 
+REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM hr_movie_theather;
+REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM hr_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE box_office, employees FROM hr_movie_theather;
+REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM cashier_movie_thather;
+REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM cashier_movie_thather;
+REVOKE ALL PRIVILEGES ON TABLE box_office, employees FROM cashier_movie_thather;
+DROP USER IF EXISTS cashier_movie_thather;
+DROP ROLE IF EXISTS hr_movie_theather;
+
+REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin_movie_theather;
+REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, cinema_hall, session, tickets, directors FROM admin_movie_theather;
+REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin1_movie_theather;
+REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin1_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, cinema_hall, session, tickets, directors FROM admin1_movie_theather;
+DROP USER IF EXISTS admin1_movie_theather;
+DROP ROLE IF EXISTS admin_movie_theather;
+
 CREATE ROLE hr_movie_theather;
 GRANT CONNECT ON DATABASE smekhnev_ii_db TO hr_movie_theather;
 GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
@@ -363,10 +381,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE session TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE directors TO hr_movie_theather;
 
-CREATE USER cashir_movie_thather WITH PASSWORD 'cashier';
-GRANT hr_movie_theather TO cashir_movie_thather;
-GRANT CONNECT ON DATABASE smekhnev_ii_db TO cashir_movie_thather;
-ALTER ROLE hr_uscashir_movie_thatherer IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
+CREATE USER cashier_movie_thather WITH PASSWORD 'cashier';
+GRANT hr_movie_theather TO cashier_movie_thather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO cashier_movie_thather;
+ALTER ROLE cashier_movie_thather IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
 
 CREATE USER admin1_movie_theather WITH PASSWORD 'admin1';
 GRANT admin_movie_theather TO admin1_movie_theather;
