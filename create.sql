@@ -1,18 +1,39 @@
-DROP SCHEMA IF EXISTS movie_theather CASCADE;
+ALTER TABLE tickets DROP CONSTRAINT IF EXISTS tickets_fk_session_id;
+ALTER TABLE tickets DROP CONSTRAINT IF EXISTS tickets_fk_box_office_id;
+ALTER TABLE session DROP CONSTRAINT IF EXISTS session_fk_movie_id;
+ALTER TABLE session DROP CONSTRAINT IF EXISTS session_fk_hall_id;
+ALTER TABLE box_office DROP CONSTRAINT IF EXISTS box_office_fk_employee;
+ALTER TABLE movie DROP CONSTRAINT IF EXISTS movie_fk_director_id;
+
+DROP VIEW IF EXISTS movie_sessions_view;
+DROP VIEW IF EXISTS ticket_sales_view;
+DROP VIEW IF EXISTS employee_schedule_view;
+
+DROP FUNCTION IF EXISTS getRandomSession();
+DROP FUNCTION IF EXISTS getRandomOffice();
+DROP PROCEDURE IF EXISTS generateTicket(integer);
+
+DROP TRIGGER IF EXISTS Ticket_audit_trigger ON tickets;
+DROP FUNCTION IF EXISTS ticket_audit();
+
+DROP SEQUENCE IF EXISTS ticket_id_sequence;
+
+DROP TABLE IF EXISTS movie;
+DROP TABLE IF EXISTS box_office;
+DROP TABLE IF EXISTS cinema_hall;
+DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS directors;
+DROP TABLE IF EXISTS Ticket_Audit;
+
+DROP SCHEMA IF EXISTS movie_theather;
 
 CREATE SCHEMA IF NOT EXISTS movie_theather AUTHORIZATION smekhnev_ii;
 
 COMMENT ON SCHEMA movie_theather IS 'Кинотеатр';
 ALTER ROLE smekhnev_ii IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
 GRANT ALL ON SCHEMA movie_theather TO smekhnev_ii;
-
-DROP TABLE IF EXISTS movie CASCADE;
-DROP TABLE IF EXISTS box_office CASCADE;
-DROP TABLE IF EXISTS cinema_hall CASCADE;
-DROP TABLE IF EXISTS session CASCADE;
-DROP TABLE IF EXISTS tickets CASCADE;
-DROP TABLE IF EXISTS employees CASCADE;
-DROP TABLE IF EXISTS directors CASCADE;
 
 CREATE TABLE IF NOT EXISTS movie (
 	movie_id serial NOT NULL,
@@ -236,9 +257,9 @@ JOIN
     session s ON t.ticket_session_id = s.session_id
 JOIN
     movie m ON s.session_movie_id = m.movie_id
-LEFT JOIN
+JOIN
     box_office b ON t.ticket_office_id = b.office_id
-LEFT JOIN
+JOIN
     employees e ON b.office_employee_id = e.employee_id;
 
 CREATE VIEW employee_schedule_view AS
@@ -350,19 +371,19 @@ EXECUTE FUNCTION ticket_audit();
 
 REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM hr_movie_theather;
 REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM hr_movie_theather;
-REVOKE ALL PRIVILEGES ON TABLE box_office, employees FROM hr_movie_theather;
-REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM cashier_movie_thather;
-REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM cashier_movie_thather;
-REVOKE ALL PRIVILEGES ON TABLE box_office, employees FROM cashier_movie_thather;
-DROP USER IF EXISTS cashier_movie_thather;
+REVOKE ALL PRIVILEGES ON TABLE box_office, employees, movie, session, directors, tickets, cinema_hall FROM hr_movie_theather;
+REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM cashier_movie_theather;
+REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM cashier_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE box_office, employees, movie, session, directors, tickets, cinema_hall FROM cashier_movie_theather;
+DROP USER IF EXISTS cashier_movie_theather;
 DROP ROLE IF EXISTS hr_movie_theather;
 
 REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin_movie_theather;
 REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin_movie_theather;
-REVOKE ALL PRIVILEGES ON TABLE movie, cinema_hall, session, tickets, directors FROM admin_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall FROM admin_movie_theather;
 REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin1_movie_theather;
 REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin1_movie_theather;
-REVOKE ALL PRIVILEGES ON TABLE movie, cinema_hall, session, tickets, directors FROM admin1_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall FROM admin1_movie_theather;
 DROP USER IF EXISTS admin1_movie_theather;
 DROP ROLE IF EXISTS admin_movie_theather;
 
@@ -370,21 +391,22 @@ CREATE ROLE hr_movie_theather;
 GRANT CONNECT ON DATABASE smekhnev_ii_db TO hr_movie_theather;
 GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE box_office TO hr_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE employees TO hr_movie_theather;
 
 CREATE ROLE admin_movie_theather;
-GRANT CONNECT ON DATABASE smekhnev_ii_db TO hr_movie_theather;
-GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE movie TO hr_movie_theather;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE cinema_hall TO hr_movie_theather;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE session TO hr_movie_theather;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO hr_movie_theather;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE directors TO hr_movie_theather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO admin_movie_theather;
+GRANT USAGE ON SCHEMA movie_theather TO admin_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE movie TO admin_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE cinema_hall TO admin_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE session TO admin_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO admin_movie_theather;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE directors TO admin_movie_theather;
 
-CREATE USER cashier_movie_thather WITH PASSWORD 'cashier';
-GRANT hr_movie_theather TO cashier_movie_thather;
-GRANT CONNECT ON DATABASE smekhnev_ii_db TO cashier_movie_thather;
-ALTER ROLE cashier_movie_thather IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
+CREATE USER cashier_movie_theather WITH PASSWORD 'cashier';
+GRANT hr_movie_theather TO cashier_movie_theather;
+GRANT CONNECT ON DATABASE smekhnev_ii_db TO cashier_movie_theather;
+ALTER ROLE cashier_movie_theather IN DATABASE smekhnev_ii_db SET search_path TO movie_theather, public;
 
 CREATE USER admin1_movie_theather WITH PASSWORD 'admin1';
 GRANT admin_movie_theather TO admin1_movie_theather;
