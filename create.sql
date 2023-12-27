@@ -380,10 +380,10 @@ DROP ROLE IF EXISTS hr_movie_theather;
 
 REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin_movie_theather;
 REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin_movie_theather;
-REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall FROM admin_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall, box_office, employees, tickets FROM admin_movie_theather;
 REVOKE ALL PRIVILEGES ON DATABASE smekhnev_ii_db FROM admin1_movie_theather;
 REVOKE ALL PRIVILEGES ON SCHEMA movie_theather FROM admin1_movie_theather;
-REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall FROM admin1_movie_theather;
+REVOKE ALL PRIVILEGES ON TABLE movie, session, directors, cinema_hall, box_office, employees, tickets FROM admin1_movie_theather;
 DROP USER IF EXISTS admin1_movie_theather;
 DROP ROLE IF EXISTS admin_movie_theather;
 
@@ -393,6 +393,9 @@ GRANT USAGE ON SCHEMA movie_theather TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE box_office TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tickets TO hr_movie_theather;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE employees TO hr_movie_theather;
+GRANT SELECT movie TO hr_movie_theather;
+GRANT SELECT cinema_hall TO hr_movie_theather;
+GRANT SELECT session TO hr_movie_theather;
 
 CREATE ROLE admin_movie_theather;
 GRANT CONNECT ON DATABASE smekhnev_ii_db TO admin_movie_theather;
